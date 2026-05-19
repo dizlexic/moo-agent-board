@@ -567,7 +567,8 @@ onUnmounted(() => stopSocket())
 
               <!-- MCP Functions Settings -->
               <div class="mt-4 pt-4 border-t border-gray-100 dark:border-surface-border">
-                <div class="flex items-center justify-between mb-3">
+                <ColumnPermissions :board-id="boardId" />
+                <div class="flex items-center justify-between mb-3 mt-6">
                   <label class="text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300 block">Enabled MCP Functions</label>
                   <div class="flex items-center gap-2">
                     <span class="text-[10px] text-gray-500 uppercase tracking-widest">All</span>
