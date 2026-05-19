@@ -19,6 +19,15 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-password}
       - DB_NAME=${DB_NAME:-mootasks}
       - DATABASE_URL=mysql://${DB_USER:-mootasks}:${DB_PASSWORD:-password}@${DB_HOST:-db}:3306/${DB_NAME:-mootasks}
+    volumes:
+      - ./app:/app/app
+      - ./server:/app/server
+      - ./scripts:/app/scripts
+      - ./nuxt.config.ts:/app/nuxt.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./package.json:/app/package.json
+      - ./drizzle:/app/drizzle
+      - ./drizzle.config.ts:/app/drizzle.config.ts
     depends_on:
       db:
         condition: service_healthy
