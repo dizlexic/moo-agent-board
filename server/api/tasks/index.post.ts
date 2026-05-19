@@ -1,5 +1,5 @@
 import { readBody } from 'h3'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, inArray } from 'drizzle-orm'
 import { db } from '../../db'
 import { tasks, boardMembers } from '../../db/schema'
 import { generateId } from '../../utils/id'
@@ -10,6 +10,14 @@ import { emitTaskEvent } from '../../utils/socket'
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const body = await readBody(event)
+
+  if (body.taskIds && Array.isArray(body.taskIds)) {
+      // Mass update
+      await db.update(tasks)
+        .set({ status: body.status })
+        .where(inArray(tasks.id, body.taskIds))
+      return { success: true }
+  }
 
   if (!body?.boardId || typeof body.boardId !== 'string') {
     throw createError({ statusCode: 400, statusMessage: 'boardId is required' })

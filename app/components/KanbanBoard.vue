@@ -75,7 +75,10 @@ const columns = computed(() => {
   return props.showArchive ? [...cols, { title: 'Archive', status: 'archive' }] : cols
 })
 
-const emit = defineEmits<{ taskClick: [task: Task] }>()
+const emit = defineEmits<{ 
+  taskClick: [task: Task]
+  openMassAction: [taskIds: string[]]
+}>()
 
 async function onTaskMoved(taskId: string, newStatus: string, newIndex: number) {
   await moveTask(taskId, newStatus as TaskStatus, newIndex)
@@ -112,6 +115,7 @@ async function onArchiveAll() {
       @task-click="emit('taskClick', $event)"
       @contextmenu="onContextMenu"
       @archive-all="onArchiveAll"
+      @open-mass-action="emit('openMassAction', $event)"
     />
     <TaskContextMenu ref="contextMenu" :board-id="boardId" />
   </div>

@@ -16,6 +16,7 @@ const emit = defineEmits<{
   taskClick: [task: Task]
   contextmenu: [event: MouseEvent, task: Task]
   archiveAll: []
+  openMassAction: [taskIds: string[]]
 }>()
 
 const localTasks = ref<Task[]>([...props.tasks])
@@ -24,6 +25,21 @@ watch(() => props.tasks, (newTasks) => {
 })
 
 const isDragOver = ref(false)
+const isSelectMode = ref(false)
+const selectedTaskIds = ref(new Set<string>())
+
+function toggleSelectMode() {
+  isSelectMode.value = !isSelectMode.value
+  selectedTaskIds.value.clear()
+}
+
+function toggleTaskSelection(taskId: string) {
+  if (selectedTaskIds.value.has(taskId)) {
+    selectedTaskIds.value.delete(taskId)
+  } else {
+    selectedTaskIds.value.add(taskId)
+  }
+}
 
 function onChange(evt: any) {
   isDragOver.value = false
@@ -53,6 +69,13 @@ const col = computed(() => (COLUMN_COLORS as any)[props.status] || COLUMN_COLORS
           {{ title }}
         </h3>
         <button
+          v-if="tasks.length > 0"
+          @click="toggleSelectMode"
+          class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border border-gray-200 dark:border-surface-border bg-white dark:bg-surface-raised text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-surface-hover hover:text-neon-cyan dark:hover:text-neon-cyan transition-all"
+        >
+          {{ isSelectMode ? 'Cancel' : 'Select' }}
+        </button>
+        <button
           v-if="status === 'done' && tasks.length > 1"
           @click="emit('archiveAll')"
           class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border border-gray-200 dark:border-surface-border bg-white dark:bg-surface-raised text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-surface-hover hover:text-neon-cyan dark:hover:text-neon-cyan transition-all"
@@ -60,7 +83,16 @@ const col = computed(() => (COLUMN_COLORS as any)[props.status] || COLUMN_COLORS
           Archive All
         </button>
       </div>
+      <div v-if="isSelectMode && selectedTaskIds.size > 0" class="flex gap-2">
+        <button
+          class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border border-neon-cyan bg-neon-cyan/10 text-neon-cyan hover:bg-neon-cyan/20 transition-all"
+          @click="$emit('openMassAction', Array.from(selectedTaskIds))"
+        >
+          Update ({{ selectedTaskIds.size }})
+        </button>
+      </div>
       <span
+        v-else
         class="text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center"
         :class="col.badge"
         :aria-label="`${tasks.length} tasks`"
@@ -82,8 +114,16 @@ const col = computed(() => (COLUMN_COLORS as any)[props.status] || COLUMN_COLORS
       @dragleave="isDragOver = false"
     >
       <template #item="{ element }">
-        <div :data-id="element.id">
+        <div :data-id="element.id" class="flex items-center gap-2">
+          <input 
+            v-if="isSelectMode"
+            type="checkbox" 
+            :checked="selectedTaskIds.has(element.id)"
+            @change="toggleTaskSelection(element.id)"
+            class="rounded border-gray-300 text-neon-cyan focus:ring-neon-cyan"
+          />
           <TaskCard 
+            :class="{'flex-1': isSelectMode}"
             :task="element" 
             :tags="tags" 
             :task-tags="taskTags"
