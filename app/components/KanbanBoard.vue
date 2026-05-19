@@ -4,10 +4,18 @@ import type { TaskStatus } from '../composables/useTasks'
 import { useColumns } from '../composables/useColumns'
 
 import type { Tag } from '../../server/db/schema'
+import KanbanColumn from './KanbanColumn.vue'
 
 const props = defineProps<{ boardId: string, showArchive: boolean, searchQuery: string, tags: Tag[] }>()
 const { tasks, taskTags, tasksByStatus, moveTask, archiveAllDone, fetchTaskTags } = useTasks(props.boardId)
 const { columns: dynamicColumns, fetchColumns } = useColumns(props.boardId)
+
+const columnRefs = ref<InstanceType<typeof KanbanColumn>[] | null>(null)
+
+function resetAllSelections() {
+  columnRefs.value?.forEach(col => col.resetSelection())
+}
+defineExpose({ resetAllSelections })
 
 onMounted(() => {
   fetchTaskTags()
@@ -103,6 +111,7 @@ async function onArchiveAll() {
        @mousemove="onMouseMove"
   >
     <KanbanColumn
+      ref="columnRefs"
       v-for="col in columns"
       :key="col.status"
       :title="col.title"

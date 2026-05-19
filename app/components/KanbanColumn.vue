@@ -51,6 +51,13 @@ function onChange(evt: any) {
 }
 
 const col = computed(() => (COLUMN_COLORS as any)[props.status] || COLUMN_COLORS.backlog)
+
+function resetSelection() {
+  isSelectMode.value = false
+  selectedTaskIds.value.clear()
+}
+
+defineExpose({ resetSelection })
 </script>
 
 <template>

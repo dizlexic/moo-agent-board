@@ -29,6 +29,7 @@ watch(searchQuery, () => {
 })
 const selectedTask = ref<Task | null>(null)
 const showSettings = ref(false)
+const kanbanBoardRef = ref<{ resetAllSelections: () => void } | null>(null)
 
 function toggleSettings() {
   showSettings.value = !showSettings.value
@@ -79,6 +80,7 @@ async function performMassUpdate(status: string) {
     })
     showMassActionModal.value = false
     tasksToUpdate.value = []
+    kanbanBoardRef.value?.resetAllSelections()
     await fetchTasks()
   } catch (e: any) {
     alert(e.data?.message || 'Failed to update tasks')
@@ -674,7 +676,15 @@ onUnmounted(() => stopSocket())
     </transition>
 
     <div class="relative min-h-[60vh]">
-      <KanbanBoard v-if="viewMode === 'board'" :board-id="boardId" :show-archive="showArchive" :search-query="searchQuery" :tags="tags" @task-click="selectedTask = $event" @open-mass-action="openMassAction" />
+      <KanbanBoard v-if="viewMode === 'board'"
+                   ref="kanbanBoardRef"
+                   :board-id="boardId"
+                   :show-archive="showArchive"
+                   :search-query="searchQuery"
+                   :tags="tags"
+                   @task-click="selectedTask = $event"
+                   @open-mass-action="openMassAction"
+      />
       <TaskListView v-else :board-id="boardId" :show-archive="showArchive" @task-click="selectedTask = $event" />
     </div>
 
