@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     id: generateId(),
     boardId,
     title: body.title.trim(),
-    description: body.description?.trim() || '',
+    description: typeof body.description === 'string' ? body.description.trim() : '',
     status,
     priority,
     order: 0,

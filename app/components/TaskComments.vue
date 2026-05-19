@@ -22,7 +22,8 @@ const error = ref('')
 async function loadComments() {
   loading.value = true
   try {
-    comments.value = await fetchComments(props.taskId)
+    const fetchedComments = await fetchComments(props.taskId)
+    comments.value = fetchedComments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
   } catch (e: any) {
     console.error('Failed to load comments:', e)
   } finally {

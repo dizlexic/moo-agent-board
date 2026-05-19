@@ -18,12 +18,21 @@
         </div>
         <div>
           <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">Icon</label>
-          <div class="grid grid-cols-5 gap-2">
+          <button
+            type="button"
+            @click="isDropdownOpen = !isDropdownOpen"
+            class="w-full flex items-center justify-between border border-gray-200 dark:border-surface-border dark:bg-surface-raised dark:text-white rounded-lg px-3 py-2 text-lg hover:border-neon-cyan"
+          >
+            <span>{{ iconMap[icon as keyof typeof iconMap] }}</span>
+            <span class="text-xs text-gray-500">{{ isDropdownOpen ? '▲' : '▼' }}</span>
+          </button>
+
+          <div v-if="isDropdownOpen" class="grid grid-cols-5 gap-2 mt-2 p-2 border border-gray-200 dark:border-surface-border rounded-lg bg-white dark:bg-surface-raised">
             <button
               v-for="(emoji, name) in iconMap"
               :key="name"
               type="button"
-              @click="icon = name"
+              @click="icon = name; isDropdownOpen = false"
               :class="icon === name ? 'border-neon-cyan bg-neon-cyan/10' : 'border-gray-200 dark:border-surface-border'"
               class="w-full aspect-square flex items-center justify-center border rounded-lg text-lg hover:border-neon-cyan"
             >
@@ -48,6 +57,7 @@ const { createTag, fetchTags } = useTags(props.boardId)
 const name = ref('')
 const color = ref('#3b82f6')
 const icon = ref('tag')
+const isDropdownOpen = ref(false)
 
 async function onSubmit() {
   try {
