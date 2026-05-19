@@ -7,13 +7,14 @@ export default defineEventHandler(async (event) => {
   const columnId = event.context.params!.columnId;
   const body = await readBody(event);
 
+  const updateData: any = { updatedAt: new Date() };
+  if (body.name !== undefined) updateData.name = body.name;
+  if (body.description !== undefined) updateData.description = body.description;
+  if (body.instructions !== undefined) updateData.instructions = body.instructions;
+  if (body.permissions !== undefined) updateData.permissions = body.permissions;
+
   const updatedColumn = await db.update(boardColumns)
-    .set({
-      name: body.name,
-      description: body.description,
-      instructions: body.instructions,
-      updatedAt: new Date(),
-    })
+    .set(updateData)
     .where(and(eq(boardColumns.id, columnId), eq(boardColumns.boardId, boardId)));
 
   return updatedColumn;
