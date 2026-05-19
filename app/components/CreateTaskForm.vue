@@ -21,18 +21,13 @@ const taskId = ref<string | null>(null)
 const saving = ref(false)
 const saved = ref(false)
 
-const debouncedSaveGeneral = debounce(() => saveTask(), 500)
-const debouncedSaveDescription = debounce(() => saveTask(), 30000)
+const debouncedSaveTask = debounce(() => saveTask(), 500)
 
-watch(description, () => {
-  debouncedSaveDescription()
-})
+// watch([title, priority, difficulty, isHumanOnly], () => {
+//   debouncedSaveGeneral()
+// })
 
-watch([title, priority, difficulty, isHumanOnly], () => {
-  debouncedSaveGeneral()
-})
-
-async function saveTask() {
+async function saveTask(forceCreate = false) {
   if (!title.value.trim()) return
   saving.value = true
   error.value = ''
@@ -45,7 +40,7 @@ async function saveTask() {
         difficulty: difficulty.value || undefined,
         isHumanOnly: isHumanOnly.value
       })
-    } else {
+    } else if (forceCreate) {
       const task = await createTask({
         title: title.value.trim(),
         description: description.value.trim(),
@@ -66,8 +61,13 @@ async function saveTask() {
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') {
-    emit('close')
+    closeModal()
   }
+}
+
+async function closeModal() {
+  await saveTask(true)
+  emit('close')
 }
 
 onMounted(() => {
@@ -84,7 +84,7 @@ async function onSubmit() {
   if (!title.value.trim()) return
 
   if (!taskId.value) {
-    await saveTask()
+    await saveTask(true)
   }
 
   if (error.value) return
@@ -112,7 +112,7 @@ async function onSubmit() {
     aria-modal="true"
     aria-labelledby="create-task-title"
     tabindex="-1"
-    @click.self="emit('close')"
+    @click.self="closeModal"
   >
     <div class="modal-panel relative bg-white dark:bg-surface-card rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] w-full max-w-2xl border border-gray-200 dark:border-surface-border overflow-hidden">
       <div class="p-6 pb-4 border-b border-gray-100 dark:border-surface-border/50 flex items-center justify-between">
@@ -120,7 +120,7 @@ async function onSubmit() {
         <Transition name="fade">
           <div v-if="saved" class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold uppercase tracking-widest px-2 py-1 rounded">Saved</div>
         </Transition>
-        <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors text-2xl leading-none p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-surface-raised" aria-label="Close dialog">&times;</button>
+        <button @click="closeModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors text-2xl leading-none p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-surface-raised" aria-label="Close dialog">&times;</button>
       </div>
 
       <div class="p-6 pt-5">
@@ -184,7 +184,7 @@ async function onSubmit() {
           </div>
 
           <div class="flex justify-end gap-3 pt-4">
-            <button type="button" @click="emit('close')" class="px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">Cancel</button>
+            <button type="button" @click="closeModal" class="px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">Cancel</button>
             <button
               type="submit"
               :disabled="submitting || !title.trim()"
