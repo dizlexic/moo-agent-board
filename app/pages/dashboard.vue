@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { boards, invitations, sentInvitations, loading, fetchBoards, fetchInvitations, fetchSentInvitations, acceptInvitation, rejectInvitation, cancelInvitation, createBoard, leaveBoard } = useBoards()
+const { boards, invitations, sentInvitations, loading, fetchBoards, fetchInvitations, fetchSentInvitations, acceptInvitation, rejectInvitation, cancelInvitation, createBoard, leaveBoard, toggleFavorite } = useBoards()
 const { user } = useUserSession()
 
 const currentPage = ref(1)
