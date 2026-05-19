@@ -44,6 +44,12 @@ export async function createBoardMcpServer(boardId: string): Promise<McpServer> 
   if (!board) throw new Error('Board not found')
   const enabledFunctions = (board.mcpEnabledFunctions as Record<string, boolean>) || {}
 
+  const columns = await db.select().from(boardColumns).where(eq(boardColumns.boardId, boardId));
+  const getPermissions = (status: string) => {
+    const column = columns.find(c => c.status === status);
+    return (column?.permissions as Record<string, boolean>) || { view: true, add: true, move: true, delete: true };
+  };
+
   const server = new McpServer({
     name: `moo-tasks-${boardId}`,
     version: '2.0.0',
@@ -67,7 +73,8 @@ export async function createBoardMcpServer(boardId: string): Promise<McpServer> 
         if (priority) conditions.push(eq(tasks.priority, priority))
 
         const result = await db.select().from(tasks).where(and(...conditions))
-        return { content: [{ type: 'text', text: JSON.stringify({ tasks: result, count: result.length }) }] }
+        const filteredTasks = result.filter(t => getPermissions(t.status).view !== false)
+        return { content: [{ type: 'text', text: JSON.stringify({ tasks: filteredTasks, count: filteredTasks.length }) }] }
       },
     )
   }
@@ -99,6 +106,8 @@ export async function createBoardMcpServer(boardId: string): Promise<McpServer> 
       },
       async ({ title, description, priority, parentTaskId }) => {
         void logBoardEvent({ boardId, type: 'mcp_request', actor: 'AI Agent', action: 'create-task', data: { title, priority, parentTaskId } })
+        if (getPermissions('backlog').add === false) return { content: [{ type: 'text', text: JSON.stringify({ error: 'Permission denied' }) }], isError: true }
+
         const now = new Date()
         const newTask = {
           id: generateId(),
@@ -134,6 +143,7 @@ export async function createBoardMcpServer(boardId: string): Promise<McpServer> 
         const existingResults = await db.select().from(tasks).where(and(eq(tasks.id, taskId), eq(tasks.boardId, boardId)))
         const existing = existingResults[0]
         if (!existing) return { content: [{ type: 'text', text: JSON.stringify({ error: 'Task not found' }) }], isError: true }
+        if (getPermissions(existing.status).move === false || getPermissions(status).move === false) return { content: [{ type: 'text', text: JSON.stringify({ error: 'Permission denied' }) }], isError: true }
 
         await db.update(tasks).set({ status, updatedAt: new Date() }).where(eq(tasks.id, taskId))
         const updatedResults = await db.select().from(tasks).where(eq(tasks.id, taskId))
@@ -313,6 +323,7 @@ export async function createBoardMcpServer(boardId: string): Promise<McpServer> 
         const existingResults = await db.select().from(tasks).where(and(eq(tasks.id, taskId), eq(tasks.boardId, boardId)))
         const existing = existingResults[0]
         if (!existing) return { content: [{ type: 'text', text: JSON.stringify({ error: 'Task not found' }) }], isError: true }
+        if (getPermissions(existing.status).delete === false) return { content: [{ type: 'text', text: JSON.stringify({ error: 'Permission denied' }) }], isError: true }
 
         await db.delete(tasks).where(eq(tasks.id, taskId))
         emitTaskEvent(boardId, 'task:deleted', { id: taskId, boardId })
