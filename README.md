@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.svg" alt="Moo Tasks Logo" width="160" />
+  <img src="https://raw.githubusercontent.com/dizlexic/moo-tasks/refs/heads/main/app/assets/logo.svg" alt="Moo Tasks Logo" width="160" />
 </p>
 
 <h1 align="center">Moo Tasks</h1>
