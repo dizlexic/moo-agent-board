@@ -63,8 +63,27 @@ watch(() => board.value, (newBoard) => {
 const viewMode = ref<'board' | 'list'>('board')
 const showArchive = ref(false)
 
-const pendingTransfer = ref<any>(null)
-const recipientEmail = ref('')
+const showMassActionModal = ref(false)
+const tasksToUpdate = ref<string[]>([])
+
+function openMassAction(taskIds: string[]) {
+  tasksToUpdate.value = taskIds
+  showMassActionModal.value = true
+}
+
+async function performMassUpdate(status: string) {
+  try {
+    await $fetch('/api/tasks', {
+      method: 'POST',
+      body: { taskIds: tasksToUpdate.value, status }
+    })
+    showMassActionModal.value = false
+    tasksToUpdate.value = []
+    await fetchTasks()
+  } catch (e: any) {
+    alert(e.data?.message || 'Failed to update tasks')
+  }
+}
 
 async function requestTransfer() {
   if (!recipientEmail.value) return
@@ -649,7 +668,7 @@ onUnmounted(() => stopSocket())
     </transition>
 
     <div class="relative min-h-[60vh]">
-      <KanbanBoard v-if="viewMode === 'board'" :board-id="boardId" :show-archive="showArchive" :search-query="searchQuery" :tags="tags" @task-click="selectedTask = $event" />
+      <KanbanBoard v-if="viewMode === 'board'" :board-id="boardId" :show-archive="showArchive" :search-query="searchQuery" :tags="tags" @task-click="selectedTask = $event" @open-mass-action="openMassAction" />
       <TaskListView v-else :board-id="boardId" :show-archive="showArchive" @task-click="selectedTask = $event" />
     </div>
 
@@ -669,6 +688,15 @@ onUnmounted(() => stopSocket())
       leave-to-class="modal-leave-to"
     >
       <TaskDetailModal v-if="selectedTask" :task="selectedTask" :board-id="boardId" @close="selectedTask = null" @open-task="selectedTask = $event" />
+    </transition>
+
+    <transition
+      enter-active-class="modal-enter-active"
+      enter-from-class="modal-enter-from"
+      leave-active-class="modal-leave-active"
+      leave-to-class="modal-leave-to"
+    >
+      <MassActionModal v-if="showMassActionModal" @close="showMassActionModal = false" @confirm="performMassUpdate" />
     </transition>
     </div>
   </main>
