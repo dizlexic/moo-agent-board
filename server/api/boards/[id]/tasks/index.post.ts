@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
+  console.log('Received task creation body:', body)
 
   if (!body?.title || typeof body.title !== 'string' || !body.title.trim()) {
     throw createError({ statusCode: 400, statusMessage: 'Title is required' })

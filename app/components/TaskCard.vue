@@ -38,7 +38,7 @@ const difficultyColors: Record<number, string> = {
 
 <template>
   <div
-    class="bg-white dark:bg-surface-raised rounded-xl shadow-sm dark:shadow-md dark:shadow-black/20 border border-gray-200 dark:border-surface-border p-2 cursor-pointer hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-neon-cyan/10 hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-neon-cyan/30 transition-all duration-200 group"
+    class="w-full bg-white dark:bg-surface-raised rounded-xl shadow-sm dark:shadow-md dark:shadow-black/20 border border-gray-200 dark:border-surface-border p-2 cursor-pointer hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-neon-cyan/10 hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-neon-cyan/30 transition-all duration-200 group"
     :class="priorityBorder[task.priority] || priorityBorder.medium"
     role="button"
     :aria-label="`Task: ${task.title}, Priority: ${task.priority}${task.assignee ? ', Assigned to: ' + task.assignee : ''}`"
