@@ -1,0 +1,1 @@
+ALTER TABLE `board_columns` ADD `permissions` json;

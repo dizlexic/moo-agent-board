@@ -133,6 +133,7 @@ export const boardColumns = mysqlTable('board_columns', {
   instructions: text('instructions'),
   status: mysqlEnum('status', ['backlog', 'todo', 'in_progress', 'review', 'done', 'archive']).notNull().default('backlog'),
   order: int('order').notNull().default(0),
+  permissions: json('permissions'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
 })
