@@ -468,7 +468,7 @@ services:
 ---
 
 <p align="center">
-  <img src="public/logo.svg" alt="Moo Tasks" width="48" />
+  <img src="https://raw.githubusercontent.com/dizlexic/moo-tasks/refs/heads/main/app/assets/logo.svg" alt="Moo Tasks" width="48" />
   <br/>
   <sub>Built with 🐄 by <a href="https://buymeacoffee.com/dizlexic">dizlexic</a></sub>
 </p>
