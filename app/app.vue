@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import logo from '~/assets/logo.svg'
 const currentBoardName = useState<string | null>('currentBoardName', () => null)
 const currentBoardDescription = useState<string | null>('currentBoardDescription', () => null)
 
@@ -72,7 +73,7 @@ async function logout() {
           <svg v-if="isOnBoard" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 group-hover:scale-110 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          <img v-else src="/logo.svg" class="h-8 w-8 group-hover:scale-110 transition-transform shrink-0" alt="Moo Tasks Logo" />
+          <img v-else :src="logo" class="h-8 w-8 group-hover:scale-110 transition-transform shrink-0" alt="Moo Tasks Logo" />
         </NuxtLink>
         <div class="flex flex-col min-w-0">
           <NuxtLink
