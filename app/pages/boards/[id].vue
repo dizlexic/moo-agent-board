@@ -227,11 +227,12 @@ async function revokeToken() {
 }
 
 async function exportBoard() {
-  const data = await $fetch(`/api/boards/${boardId}/export`)
+  const url = `/api/boards/${boardId}/export` + (exportComments.value ? '?exportComments=true' : '')
+  const data = await $fetch(url)
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
+  const urlObj = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  a.href = url
+  a.href = urlObj
   a.download = `${board.value!.name}.json`
   a.click()
 }
@@ -650,6 +651,10 @@ onUnmounted(() => stopSocket())
         <!-- Settings Footer (Export/Delete) -->
         <div class="mt-8 pt-8 border-t border-gray-200 dark:border-surface-border flex items-center justify-end gap-4">
           <!-- Export Board -->
+          <div class="flex items-center gap-2">
+            <input type="checkbox" v-model="exportComments" id="export-comments" class="rounded border-gray-300 text-neon-cyan focus:ring-neon-cyan" />
+            <label for="export-comments" class="text-[10px] font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300 cursor-pointer">Export Comments</label>
+          </div>
           <button
             @click="exportBoard"
             class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-200 transition-all active:scale-95"

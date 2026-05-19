@@ -1,11 +1,13 @@
-import { getRouterParam } from 'h3'
+import { getRouterParam, getQuery } from 'h3'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../../../db'
-import { boards, tasks, boardMembers } from '../../../db/schema'
+import { boards, tasks, boardMembers, comments } from '../../../db/schema'
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
   const id = getRouterParam(event, 'id')!
+  const query = getQuery(event)
+  const exportComments = query.exportComments !== undefined && query.exportComments !== 'false'
 
   // Check board existence and membership
   const boardsResult = await db.select().from(boards).where(eq(boards.id, id))
@@ -22,6 +24,11 @@ export default defineEventHandler(async (event) => {
 
   // Fetch tasks
   const boardTasks = await db.select().from(tasks).where(eq(tasks.boardId, id))
+  
+  let taskComments: any[] = []
+  if (exportComments) {
+    taskComments = await db.select().from(comments).where(eq(comments.boardId, id))
+  }
 
   return {
     name: board.name,
@@ -34,6 +41,7 @@ export default defineEventHandler(async (event) => {
       order: t.order,
       assignee: t.assignee,
       parentTaskId: t.parentTaskId,
+      comments: exportComments ? taskComments.filter(c => c.taskId === t.id) : undefined
     }))
   }
 })
