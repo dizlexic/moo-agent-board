@@ -22,6 +22,15 @@ export const getVerificationEmail = (url: string) => ({
   `),
 });
 
+export const getInvitationEmail = (boardName: string, url: string) => ({
+  subject: `You've been invited to ${boardName}`,
+  text: `You've been invited to join ${boardName}. Visit the dashboard: ${url}`,
+  html: baseLayout(`
+    <p>You've been invited to join <strong>${boardName}</strong>.</p>
+    <p style="text-align: center;"><a href="${url}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Go to Dashboard</a></p>
+  `),
+});
+
 export const getPasswordResetEmail = (url: string) => ({
   subject: 'Reset your password',
   text: `You requested a password reset. Click the following link to reset your password: ${url}`,

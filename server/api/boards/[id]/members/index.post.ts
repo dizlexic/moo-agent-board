@@ -3,6 +3,7 @@ import { eq, and } from 'drizzle-orm'
 import { db } from '../../../../db'
 import { boardMembers, users, invitations, boards } from '../../../../db/schema'
 import { generateId } from '../../../../utils/id'
+import { getInvitationEmail } from '../../../../utils/email-templates'
 import { sendEmail } from '../../../../utils/mailer'
 import { logBoardEvent } from '../../../../utils/logs'
 
@@ -67,7 +68,9 @@ export default defineEventHandler(async (event) => {
 
   const board = await db.select().from(boards).where(eq(boards.id, boardId))
   const boardName = board[0]?.name || 'a board'
-  await sendEmail(email, `You've been invited to ${boardName}`, `You've been invited to join ${boardName}.`)
+  const dashboardUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/dashboard`
+  const emailTemplate = getInvitationEmail(boardName, dashboardUrl)
+  await sendEmail(email, emailTemplate.subject, emailTemplate.text, emailTemplate.html)
 
   return { email, invited: true, message: 'Invitation sent' }
 })
