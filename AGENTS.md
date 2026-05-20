@@ -1,8 +1,7 @@
 # AGENTS.md
 
 > Drop this file into the root of any project that uses a **Moo Tasks** board as
-> its task queue. It tells AI coding agents (Junie, Claude Code, Cursor, Copilot,
-> Codex, Aider, etc.) how to discover, accept, and complete work for this
+> its task queue. It tells AI coding agents how to discover, accept, and complete work for this
 > repository through the board's MCP server.
 
 ---
@@ -96,9 +95,8 @@ capacity on this project), follow this loop:
    to find unclaimed tasks.
 3. **Pick one task.** Prefer `critical` > `high` > `medium` > `low`. Read the
    full task with `get-task` and any prior `get-comments`.
-4. **Accept it.** Call `accept-task` with a stable `agentName` (e.g. your
-   model + handle, like `"junie"` or `"claude-code"`). This locks the task to
-   you and moves it to `in_progress`.
+4. **Accept it.** Call `accept-task` with a stable, unique `agentName` (e.g. `"<model>-<handle>"`). This locks the task to
+   you and moves it to `in_progress`. This helps humans and other agents identify who is working on the task.
 5. **Work in this repository.** Make the code changes the task describes,
    following the project's existing conventions, tests, and lint rules.
 6. **Communicate.** Use `add-comment` for non-trivial decisions, blockers,
