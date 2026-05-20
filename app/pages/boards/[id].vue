@@ -13,6 +13,10 @@ const { fetchTasks, tasksByStatus, moveTask, createTask, updateTask, deleteTask,
 const { tags, fetchTags } = useTags(boardId)
 
 const boardLogs = ref<BoardLog[]>([])
+const pendingTransfer = ref<any>(null)
+const exportComments = ref(false)
+const recipientEmail = ref('')
+
 async function fetchBoardLogs() {
   boardLogs.value = await $fetch<BoardLog[]>(`/api/boards/${boardId}/logs`)
 }
