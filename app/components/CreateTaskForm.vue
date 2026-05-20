@@ -2,7 +2,7 @@
 import type { TaskPriority } from '~/composables/useTasks'
 import { debounce } from '~/utils/debounce'
 
-const props = defineProps<{ boardId: string }>()
+const props = defineProps<{ boardId: string; parentTaskId?: string }>()
 const emit = defineEmits<{ close: [] }>()
 const { createTask, updateTask } = useTasks(props.boardId)
 const { tags, fetchTags, addTagToTask } = useTags(props.boardId)
@@ -46,7 +46,8 @@ async function saveTask(forceCreate = false) {
         description: description.value.trim(),
         priority: priority.value,
         difficulty: difficulty.value || undefined,
-        isHumanOnly: isHumanOnly.value
+        isHumanOnly: isHumanOnly.value,
+        parentTaskId: props.parentTaskId
       })
       taskId.value = task.id
     }

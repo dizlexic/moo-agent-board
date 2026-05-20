@@ -345,6 +345,23 @@ function openParentTask() {
                 </div>
               </div>
             </div>
+
+            <!-- Child Task Section -->
+            <div class="bg-gray-50 dark:bg-surface-raised/30 rounded-2xl p-5 border border-gray-100 dark:border-surface-border/30 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-neon-cyan" aria-hidden="true">↓</span>
+                  <h3 class="text-sm font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300">Child Tasks</h3>
+                </div>
+                <button
+                  type="button"
+                  @click="emit('close'); /* Need to trigger child task creation dialog */"
+                  class="text-[10px] font-bold uppercase tracking-widest text-neon-cyan hover:text-neon-cyan/80 transition-colors"
+                >
+                  Create Child Task
+                </button>
+              </div>
+            </div>
           </form>
 
           <div class="border-t pt-6 flex items-center justify-between">

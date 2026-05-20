@@ -40,6 +40,7 @@ export default defineEventHandler(async (event) => {
     priority,
     order: 0,
     assignee: body.assignee?.trim() || null,
+    parentTaskId: typeof body.parentTaskId === 'string' ? body.parentTaskId.trim() : null,
     isHumanOnly: !!body.isHumanOnly,
     createdAt: now,
     updatedAt: now,

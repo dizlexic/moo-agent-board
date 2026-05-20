@@ -55,6 +55,14 @@ export default defineEventHandler(async (event) => {
           throw createError({ statusCode: 400, statusMessage: `Cannot complete task. Dependency '${depTask.title}' is not finished.` })
         }
       }
+      
+      if (existing.parentTaskId) {
+        const parentTaskResults = await db.select().from(tasks).where(eq(tasks.id, existing.parentTaskId))
+        const parentTask = parentTaskResults[0]
+        if (parentTask && parentTask.status !== 'done') {
+          throw createError({ statusCode: 400, statusMessage: `Cannot complete task. Parent task '${parentTask.title}' is not finished.` })
+        }
+      }
     }
     updates.status = body.status
   }
